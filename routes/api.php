@@ -6,6 +6,7 @@ use App\Http\Controllers\NewsletterSubscriberController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ScooterController;
 use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,7 @@ Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->name('register');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth:sanctum');
     Route::get('profile', [AuthController::class, 'profile'])->name('profile')->middleware('auth:sanctum');
+    Route::put('profile', [UserController::class, 'updateProfile'])->name('profile.update')->middleware('auth:sanctum');
 });
 
 Route::prefix('scooters')->group(function () {
