@@ -9,7 +9,7 @@ class PaymentService
 {
     protected StripeClient $stripeClient;
 
-    protected string $currency = 'usd';
+    protected string $currency = 'CAD'; // Canadian Dollar
 
     public function __construct()
     {
