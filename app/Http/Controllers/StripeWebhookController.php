@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\RideConfirmationMail;
+use Carbon\Carbon;
+use Hamcrest\Number\OrderingComparison;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Webhook;
 
@@ -80,6 +84,15 @@ class StripeWebhookController extends Controller
                 if ($order->status === 'pending') {
                     $order->status = 'paid';
                     $order->save();
+                    $user = $order->user;
+                    Mail::to($user->email)->queue( new RideConfirmationMail(
+                        $user->firstname, 
+                        $order->scooter->name, 
+                        $order->duration, 
+                        $order->booking_date, 
+                        Carbon::parse($order->start_time)->format('h:i A'),
+                        $order->total_price
+                    ));
                     $transaction = $order->transaction;
                     Log::info('Order '.$order->id.' status updated to paid.');
                     if ($transaction) {

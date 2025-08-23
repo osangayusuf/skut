@@ -17,6 +17,8 @@ class Order extends Model
         'end_time',
         'pickup_location',
         'stripe_session_id',
+        'duration',
+        'booking_date'
     ];
 
     public function user(): BelongsTo

@@ -76,9 +76,11 @@ class OrderController extends Controller
                 }
                 $user = auth()->user();
                 $validated = $request->validated();
+                $validated['booking_date'] = Carbon::parse($validated['start_time'])->toDateString();
+
                 $validated['end_time'] = Carbon::create($validated['start_time'])->addHours($validated['duration'])->format('Y-m-d H:i:s');
                 $validated['total_price'] = Scooter::findOrFail($validated['scooter_id'])->pricing[$validated['duration']];
-
+               
                 $order = $user->orders()->create($validated);
                 $paymentDetails = $this->paymentService->createOrderCheckoutSession($order);
                 $order->update(['stripe_session_id' => $paymentDetails['sessionId']]);
