@@ -26,7 +26,6 @@ class StoreOrderRequest extends FormRequest
 
         return [
             'scooter_id' => 'required|exists:scooters,id',
-            'status' => 'required|in:pending,completed,cancelled',
             'start_time' => 'required|date|after_or_equal:'.$minStartTime,
             'duration' => 'required|integer|in:1,2,4,8,24,168',
             'pickup_location' => 'required|string|max:255',

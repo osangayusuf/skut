@@ -21,6 +21,10 @@ class Order extends Model
         'booking_date'
     ];
 
+    protected $casts = [
+        'status' => 'string',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

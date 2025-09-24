@@ -81,15 +81,14 @@ class StripeWebhookController extends Controller
             $order = \App\Models\Order::where('id', $session->client_reference_id)->first();
 
             if ($order) {
-                if ($order->status === 'pending') {
-                    $order->status = 'paid';
-                    $order->save();
+                if ($order->status == 'pending') {
+                    $order->update(['status' => 'paid']);
                     $user = $order->user;
                     Mail::to($user->email)->queue( new RideConfirmationMail(
-                        $user->firstname, 
-                        $order->scooter->name, 
-                        $order->duration, 
-                        $order->booking_date, 
+                        $user->firstname,
+                        $order->scooter->name,
+                        $order->duration,
+                        $order->booking_date,
                         Carbon::parse($order->start_time)->format('h:i A'),
                         $order->total_price
                     ));

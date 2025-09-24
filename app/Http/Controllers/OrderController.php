@@ -80,7 +80,7 @@ class OrderController extends Controller
 
                 $validated['end_time'] = Carbon::create($validated['start_time'])->addHours($validated['duration'])->format('Y-m-d H:i:s');
                 $validated['total_price'] = Scooter::findOrFail($validated['scooter_id'])->pricing[$validated['duration']];
-               
+
                 $order = $user->orders()->create($validated);
                 $paymentDetails = $this->paymentService->createOrderCheckoutSession($order);
                 $order->update(['stripe_session_id' => $paymentDetails['sessionId']]);
@@ -122,7 +122,7 @@ class OrderController extends Controller
             if (auth()->user()->isAdmin() || auth()->user()->id === $order->user_id) {
                 return response()->json([
                     'message' => 'Order retrieved successfully.',
-                    'data' => new OrderResource($order),
+                    'data' => new OrderResource($order->load(['user', 'scooter'])),
                 ]);
             } else {
                 return response()->json([
@@ -165,6 +165,50 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to delete order.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function markOrderAsInProgress(Order $order) {
+        try {
+            // only mark in progress if the order is paid for
+            if ($order->status !== 'paid') {
+                return response()->json([
+                    'message' => 'Order must be paid for before marking as in progress.',
+                ], 400);
+            }
+
+            $order->update(['status' => 'in_progress']);
+
+            return response()->json([
+                'message' => 'Order marked as in progress successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to mark order as in progress.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function markOrderAsCompleted(Order $order) {
+        try {
+            // only mark in progress if the order is in_progress for
+            if ($order->status !== 'in_progress') {
+                return response()->json([
+                    'message' => 'Order must be in progress for before marking as completed.',
+                ], 400);
+            }
+
+            $order->update(['status' => 'completed']);
+
+            return response()->json([
+                'message' => 'Order marked as completed successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to mark order as completed.',
                 'error' => $e->getMessage(),
             ], 500);
         }

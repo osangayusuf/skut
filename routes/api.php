@@ -41,6 +41,8 @@ Route::prefix('orders')->group(function () {
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::put('/{order}', [OrderController::class, 'update'])->name('orders.update');
         Route::delete('/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+        Route::get('{order}/mark-as-completed', [OrderController::class, 'markOrderAsCompleted'])->name('orders.mark-as-completed');
+        Route::get('{order}/mark-as-in-progress', [OrderController::class, 'markOrderAsInProgress'])->name('orders.mark-as-in-progress');
     });
 });
 
